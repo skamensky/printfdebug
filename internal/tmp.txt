@@ -1,0 +1,4 @@
+StructMethod
+StructMethodWithArgsAndReturn
+StructMethodWithArgs
+StructMethodWithReturn

@@ -1,0 +1,4 @@
+package testassest
+
+func Func() {
+}
