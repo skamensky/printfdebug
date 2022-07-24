@@ -6,10 +6,20 @@ import (
 	"runtime"
 )
 
+func maxInt(first int,second int) (max int){
+	if first>second{
+		return first
+	}else{
+		return second
+	}
+}
+
 func Printf(message string, pathDepthFromEnd int) {
 	_, file, line, ok := runtime.Caller(1)
 	if ok {
-		limited := filepath.Join(filepath.SplitList(file)[-pathDepthFromEnd:]...)
+		fileParts:=filepath.SplitList(file)
+		pathFromEndSafe:=maxInt(len(fileParts),pathDepthFromEnd)
+		limited := filepath.Join([pathFromEndSafe:]...)
 		fmt.Printf("%v:%v %v\n", limited, line, message)
 	} else {
 		fmt.Printf("unkown_file:? %v\n", message)
