@@ -2,10 +2,10 @@ package cmd
 
 import (
 	"bytes"
+	"github.com/skamensky/printfdebug/internal"
 	"github.com/spf13/cobra"
 	"io"
 	"os"
-	"printfdebug/internal"
 )
 
 func init() {

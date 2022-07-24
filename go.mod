@@ -1,4 +1,4 @@
-module printfdebug
+module github.com/skamensky/printfdebug
 
 go 1.18
 

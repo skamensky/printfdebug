@@ -2,8 +2,8 @@ package internal
 
 import (
 	"bytes"
+	"github.com/skamensky/printfdebug/internal/options"
 	"os"
-	"printfdebug/internal/options"
 )
 
 func NormalizePath(filepath string) string {

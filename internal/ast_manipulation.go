@@ -9,9 +9,9 @@ import (
 	"github.com/dave/dst/decorator/resolver/goast"
 	"github.com/dave/dst/decorator/resolver/guess"
 	"github.com/dave/dst/dstutil"
+	"github.com/skamensky/printfdebug/internal/options"
 	"go/parser"
 	"go/token"
-	"printfdebug/internal/options"
 )
 
 type funcInfo struct {

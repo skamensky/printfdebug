@@ -4,7 +4,7 @@ Copyright © 2022 NAME HERE <EMAIL ADDRESS>
 */
 package main
 
-import "printfdebug/cmd"
+import "github.com/skamensky/printfdebug/cmd"
 
 func main() {
 	cmd.Execute()
