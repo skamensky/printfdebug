@@ -27,9 +27,12 @@ func Execute() {
 }
 
 func init() {
-	rootCmd.PersistentFlags().BoolVarP(&OPTIONS.Inplace, "inplace", "i", false, "If specified, the file on disk is overwritten. The default is to output to stdout.")
-	rootCmd.PersistentFlags().BoolVarP(&OPTIONS.UseRuntime, "runtime", "r", true, "Whether or not to add a printfdebug specific function call to aid with output. The alternative is a simple fmt.Printf statement.")
+	rootCmd.PersistentFlags().BoolVarP(&OPTIONS.Overwrite, "write", "w", false, "If specified, the file on disk is overwritten. The default is to output to stdout.")
+	rootCmd.PersistentFlags().BoolVarP(&OPTIONS.NoRuntime, "no-runtime", "n", false, "Disable the injection of the printfdebug function definition into your file. The alternative is a simple fmt.Printf statement.")
 	rootCmd.PersistentFlags().StringVarP(&OPTIONS.FilePath, "file", "f", "", "The file path.")
+	rootCmd.PersistentFlags().StringVarP(&OPTIONS.OutFile, "out-file", "o", "", "An optional output file. Cannot be used with `write`")
+	rootCmd.PersistentFlags().IntVarP(&OPTIONS.PathDepth, "path-depth", "d", 1, "Is only taken into account if `no-runtime` is not set. The depth of the directory tree to print from the printf function. Defaults to only the current file name.")
 	_ = rootCmd.MarkPersistentFlagRequired("file")
+	rootCmd.MarkFlagsMutuallyExclusive("out-file", "write")
 
 }
