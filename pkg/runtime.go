@@ -20,7 +20,11 @@ func Printf(message string, pathDepthFromEnd int) {
 		fileParts := filepath.SplitList(file)
 		pathFromEndSafe := maxInt(len(fileParts), pathDepthFromEnd)
 		limited := filepath.Join(fileParts[pathFromEndSafe:]...)
-		fmt.Printf("%v:%v %v\n", limited, line, message)
+		limitedCleaned := "??"
+		if limited != "" {
+			limitedCleaned = limited
+		}
+		fmt.Printf("%v:%v %v\n", limitedCleaned, line, message)
 	} else {
 		fmt.Printf("unkown_file:? %v\n", message)
 
