@@ -53,7 +53,7 @@ Use "printfdebug [command] --help" for more information about a command.
 - Working with custom code bases that have modified the standard library
 
 # Todo
-- Go fmt automatically (or does dst already handle that?)
+- Go fmt automatically (or does dst alreadu handle that?)
 - Optional message formatting (before and after function with linenum and name as template vars)
 - Optional list of excluded or included function names
 - Clean up TODO's in code
@@ -75,7 +75,7 @@ To add a new test
 The readme is generated automatically to inject examples and CLI usage.
 After adding tests or modifying the CLI, run ` go run internal/readme/gen_readme.go`
 
-Do not make changes directly to the `README.md` file. Only ever make changes to the file `README_template.md` and regenerate.
+Do not make changed directly to the `README.md` file. Only ever make changes to the file `README_template.md` and regenerate.
 # Examples
 The below examples are generated automatically from test results
 
@@ -587,7 +587,7 @@ func printfdebug_Printf_FuncPanic(message string, pathDepthFromEnd int) {
 ```
 </details>
 <details>
-  <summary>Function Stored As Var (No Runtime)</summary>
+  <summary>Function Stored As Variable (No Runtime)</summary>
 
 Running `printfdebug --file internal/tests/testassets/FuncStoredAsVar.go add --no-runtime`
 On a file containing
@@ -614,7 +614,7 @@ var FuncStoredAsVar = func() error {
 ```
 </details>
 <details>
-  <summary>Function Stored As Var (With Runtime)</summary>
+  <summary>Function Stored As Variable (With Runtime)</summary>
 
 Running `printfdebug --file internal/tests/testassets/FuncStoredAsVar.go add`
 On a file containing
@@ -671,7 +671,7 @@ func printfdebug_Printf_FuncStoredAsVar(message string, pathDepthFromEnd int) {
 ```
 </details>
 <details>
-  <summary>Function Stored As Var Assignment (No Runtime)</summary>
+  <summary>Function Stored As Variable Assignment (No Runtime)</summary>
 
 Running `printfdebug --file internal/tests/testassets/FuncStoredAsVarAssignment.go add --no-runtime`
 On a file containing
@@ -718,7 +718,7 @@ func FuncStoredAsVarAssignment() {
 ```
 </details>
 <details>
-  <summary>Function Stored As Var Assignment (With Runtime)</summary>
+  <summary>Function Stored As Variable Assignment (With Runtime)</summary>
 
 Running `printfdebug --file internal/tests/testassets/FuncStoredAsVarAssignment.go add`
 On a file containing
@@ -796,7 +796,7 @@ func printfdebug_Printf_FuncStoredAsVarAssignment(message string, pathDepthFromE
 ```
 </details>
 <details>
-  <summary>Function Stored As Var Value Spec (No Runtime)</summary>
+  <summary>Function Stored As Variable Value Spec (No Runtime)</summary>
 
 Running `printfdebug --file internal/tests/testassets/FuncStoredAsVarValueSpec.go add --no-runtime`
 On a file containing
@@ -845,7 +845,7 @@ func FuncStoredAsVarValueSpec() {
 ```
 </details>
 <details>
-  <summary>Function Stored As Var Value Spec (With Runtime)</summary>
+  <summary>Function Stored As Variable Value Spec (With Runtime)</summary>
 
 Running `printfdebug --file internal/tests/testassets/FuncStoredAsVarValueSpec.go add`
 On a file containing

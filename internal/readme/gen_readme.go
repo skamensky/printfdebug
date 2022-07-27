@@ -44,6 +44,9 @@ func GetMarkdownBlockForFunction(file tests.TestFile) string {
 		if word == "Args" {
 			words[idx] = "Arguments"
 		}
+		if word == "Var" {
+			words[idx] = "Variable"
+		}
 	}
 	exampleName := strings.Join(words, " ")
 	cmdNice := fmt.Sprintf("printfdebug %v", strings.Join(cmd, " "))
