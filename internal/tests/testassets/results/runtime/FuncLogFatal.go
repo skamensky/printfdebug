@@ -3,8 +3,10 @@ package testassest
 import (
 	"fmt"
 	"log"
+	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 )
 
 func FuncLogFatal() {
@@ -29,12 +31,14 @@ func FuncLogFatalf() {
 	printfdebug_Printf_FuncLogFatal("Leaving \"FuncLogFatalf\"\n", 1) // automatically added by printf-debugger. Do not change this comment. It is an identifier.
 }
 
-var _ = runtime.Caller // automatically added by printf-debugger. Do not change this comment. It is an identifier.
-var _ = filepath.Clean // automatically added by printf-debugger. Do not change this comment. It is an identifier.
-var _ = fmt.Println    // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = runtime.Caller   // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = filepath.Clean   // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = fmt.Println      // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = strings.Split    // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = os.PathSeparator // automatically added by printf-debugger. Do not change this comment. It is an identifier.
 func printfdebug_Printf_FuncLogFatal(message string, pathDepthFromEnd int) {
-	maxInt := func(first int, second int) (max int) {
-		if first > second {
+	minInt := func(first int, second int) (min int) {
+		if first < second {
 			return first
 		} else {
 			return second
@@ -43,9 +47,9 @@ func printfdebug_Printf_FuncLogFatal(message string, pathDepthFromEnd int) {
 
 	_, file, line, ok := runtime.Caller(1)
 	if ok {
-		fileParts := filepath.SplitList(file)
-		pathFromEndSafe := maxInt(len(fileParts), pathDepthFromEnd)
-		limited := filepath.Join(fileParts[pathFromEndSafe:]...)
+		fileParts := strings.Split(file, string(os.PathSeparator))
+		pathFromEndSafe := minInt(len(fileParts), pathDepthFromEnd)
+		limited := filepath.Join(fileParts[len(fileParts)-pathFromEndSafe:]...)
 		limitedCleaned := "??"
 		if limited != "" {
 			limitedCleaned = limited

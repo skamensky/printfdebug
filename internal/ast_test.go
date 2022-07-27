@@ -172,6 +172,84 @@ func TestFuncYesRuntime(t *testing.T) {
 	}
 }
 
+func TestFuncImmediatelyInvokedNoRuntime(t *testing.T) {
+	
+	err := os.Setenv("PATH",".")
+	if err != nil {
+		panic(err)
+	}
+	testFile := tests.TestFile{
+		Command: tests.ADD,
+		InFile:  "internal/tests/testassets/FuncImmediatelyInvoked.go",
+		Type:    tests.NoRuntime,
+	}
+
+	testFileRemove := testFile
+	testFileRemove.Command = tests.REMOVE
+
+	stdout, stderr, err := testFile.ExecuteCommand(testFile.BuildCommand(false))
+	if stderr != "" {
+		t.Errorf("Add command stderr is not empty: %v", stderr)
+	}
+	if err != nil {
+		t.Errorf("Add command resulted in an error %v", err)
+	}
+	if testFile.GetOutputFileContents() != stdout {
+		t.Errorf("%v did not evaluate to the expected output result upon the add command", testFile.InFile)
+	}
+
+	stdout, stderr, err = testFileRemove.ExecuteCommand(testFileRemove.BuildCommand(false))
+
+	if stderr != "" {
+		t.Errorf("Remove command stderr is not empty: %v", stderr)
+	}
+	if err != nil {
+		t.Errorf("Remove command resulted in an error %v", err)
+	}
+	if stdout != testFileRemove.GetInputFileContents() {
+		t.Errorf("%v did not reset to its original input upon the remove command", testFileRemove.InFile)
+	}
+}
+
+func TestFuncImmediatelyInvokedYesRuntime(t *testing.T) {
+	
+	err := os.Setenv("PATH",".")
+	if err != nil {
+		panic(err)
+	}
+	testFile := tests.TestFile{
+		Command: tests.ADD,
+		InFile:  "internal/tests/testassets/FuncImmediatelyInvoked.go",
+		Type:    tests.NoRuntime,
+	}
+
+	testFileRemove := testFile
+	testFileRemove.Command = tests.REMOVE
+
+	stdout, stderr, err := testFile.ExecuteCommand(testFile.BuildCommand(false))
+	if stderr != "" {
+		t.Errorf("Add command stderr is not empty: %v", stderr)
+	}
+	if err != nil {
+		t.Errorf("Add command resulted in an error %v", err)
+	}
+	if testFile.GetOutputFileContents() != stdout {
+		t.Errorf("%v did not evaluate to the expected output result upon the add command", testFile.InFile)
+	}
+
+	stdout, stderr, err = testFileRemove.ExecuteCommand(testFileRemove.BuildCommand(false))
+
+	if stderr != "" {
+		t.Errorf("Remove command stderr is not empty: %v", stderr)
+	}
+	if err != nil {
+		t.Errorf("Remove command resulted in an error %v", err)
+	}
+	if stdout != testFileRemove.GetInputFileContents() {
+		t.Errorf("%v did not reset to its original input upon the remove command", testFileRemove.InFile)
+	}
+}
+
 func TestFuncLogFatalNoRuntime(t *testing.T) {
 	
 	err := os.Setenv("PATH",".")

@@ -8,17 +8,17 @@ import (
 	"strings"
 )
 
-func Func() {
-	printfdebug_Printf_Func("Entering \"Func\"\n", 1) // automatically added by printf-debugger. Do not change this comment. It is an identifier.
-	printfdebug_Printf_Func("Leaving \"Func\"\n", 1)  // automatically added by printf-debugger. Do not change this comment. It is an identifier.
-}
-
-var _ = runtime.Caller   // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var FuncImmediatelyInvoked = func() error {
+	printfdebug_Printf_FuncImmediatelyInvoked("Entering \"FuncImmediatelyInvoked\"\n", 1) // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+	printfdebug_Printf_FuncImmediatelyInvoked("Leaving \"FuncImmediatelyInvoked\"\n", 1)  // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+	return nil
+}()
 var _ = filepath.Clean   // automatically added by printf-debugger. Do not change this comment. It is an identifier.
 var _ = fmt.Println      // automatically added by printf-debugger. Do not change this comment. It is an identifier.
 var _ = strings.Split    // automatically added by printf-debugger. Do not change this comment. It is an identifier.
 var _ = os.PathSeparator // automatically added by printf-debugger. Do not change this comment. It is an identifier.
-func printfdebug_Printf_Func(message string, pathDepthFromEnd int) {
+var _ = runtime.Caller   // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+func printfdebug_Printf_FuncImmediatelyInvoked(message string, pathDepthFromEnd int) {
 	minInt := func(first int, second int) (min int) {
 		if first < second {
 			return first

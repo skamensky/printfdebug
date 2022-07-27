@@ -87,6 +87,6 @@ func TestMain(m *testing.M) {
 
 func main() {
 	runBuild()
-	//genTestResults()
+	genTestResults()
 	writeTestFile()
 }

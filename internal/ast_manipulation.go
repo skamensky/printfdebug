@@ -207,20 +207,37 @@ func indexOfExpr(slice []dst.Expr, node dst.Node) int {
 	return -1
 }
 
-func getAnonymousFunctionName(c *dstutil.Cursor) string {
+func getAnonymousFunctionName(c *dstutil.Cursor, parent dst.Node, grandParent dst.Node) string {
 	node := c.Node()
-	switch parent := c.Parent().(type) {
+	resolvedName := ""
+	switch parentTyped := parent.(type) {
 	case *dst.AssignStmt:
-		idx := indexOfExpr(parent.Rhs, node)
-		lhs := parent.Lhs[idx]
+		// we want to extract varName from something like "varName:=func(){}"
+		idx := indexOfExpr(parentTyped.Rhs, node)
+		lhs := parentTyped.Lhs[idx]
 		varNode, _ := lhs.(*dst.Ident)
-		return varNode.Name
+		resolvedName = varNode.Name
 	case *dst.ValueSpec:
-		idx := indexOfExpr(parent.Values, node)
-		return parent.Names[idx].Name
-	default:
-		return "anonymous-function " + c.Name()
+		// we want to extract varName from something like "var varName =func(){}"
+		idx := indexOfExpr(parentTyped.Values, node)
+		resolvedName = parentTyped.Names[idx].Name
+
 	}
+	if resolvedName != "" {
+		return resolvedName
+	} else {
+		// we want to extract varName from something like "var varName =func(){}()"
+		switch grandParentTyped := grandParent.(type) {
+		case *dst.ValueSpec:
+			idx := indexOfExpr(grandParentTyped.Values, parent)
+			resolvedName = grandParentTyped.Names[idx].Name
+		}
+	}
+	if resolvedName == "" {
+		resolvedName = "anonymous-function " + c.Name()
+	}
+
+	return resolvedName
 }
 
 func AddPrintDebugging(options *options.Options, codeBytes *bytes.Buffer) (*bytes.Buffer, error) {
@@ -232,14 +249,19 @@ func AddPrintDebugging(options *options.Options, codeBytes *bytes.Buffer) (*byte
 	}
 	infoStack := make(funcInfoStack, 0)
 
+	nodeToParent := make(map[dst.Node]dst.Node)
+
 	preApply := func(c *dstutil.Cursor) bool {
+		nodeToParent[c.Node()] = c.Parent()
 		switch x := c.Node().(type) {
 		case *dst.FuncDecl:
 			infoStack = infoStack.Push(
 				newFuncInfo(x.Name.Name, x.Body, x.Type),
 			)
 		case *dst.FuncLit:
-			funcName := getAnonymousFunctionName(c)
+			parent := nodeToParent[x]
+			grandParent := nodeToParent[parent]
+			funcName := getAnonymousFunctionName(c, parent, grandParent)
 			infoStack = infoStack.Push(newFuncInfo(funcName, x.Body, x.Type))
 		case *dst.File:
 			if !options.NoRuntime {
@@ -249,8 +271,8 @@ func AddPrintDebugging(options *options.Options, codeBytes *bytes.Buffer) (*byte
 					x.Decls = append(x.Decls, nd)
 				}
 			}
-
 		}
+
 		return true
 	}
 

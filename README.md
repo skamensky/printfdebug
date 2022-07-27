@@ -43,6 +43,7 @@ Use "printfdebug [command] --help" for more information about a command.
   - anonymous functions
   - declared functions
   - nested functions
+  - immediately invoked functions
 - Idempotent operations.
   - Running `printfdebug add` multiple times on the same input produces sane results
   - Running `printfdebug add` on code that's been modified since the last run updates the code to add new `printf` statements
@@ -130,8 +131,10 @@ package testassest
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 )
 
 func AnonymousFunc() {
@@ -143,12 +146,14 @@ func AnonymousFunc() {
 	printfdebug_Printf_AnonymousFunc("Leaving \"AnonymousFunc\"\n", 1) // automatically added by printf-debugger. Do not change this comment. It is an identifier.
 }
 
-var _ = runtime.Caller // automatically added by printf-debugger. Do not change this comment. It is an identifier.
-var _ = filepath.Clean // automatically added by printf-debugger. Do not change this comment. It is an identifier.
-var _ = fmt.Println    // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = strings.Split    // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = os.PathSeparator // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = runtime.Caller   // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = filepath.Clean   // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = fmt.Println      // automatically added by printf-debugger. Do not change this comment. It is an identifier.
 func printfdebug_Printf_AnonymousFunc(message string, pathDepthFromEnd int) {
-	maxInt := func(first int, second int) (max int) {
-		if first > second {
+	minInt := func(first int, second int) (min int) {
+		if first < second {
 			return first
 		} else {
 			return second
@@ -157,9 +162,9 @@ func printfdebug_Printf_AnonymousFunc(message string, pathDepthFromEnd int) {
 
 	_, file, line, ok := runtime.Caller(1)
 	if ok {
-		fileParts := filepath.SplitList(file)
-		pathFromEndSafe := maxInt(len(fileParts), pathDepthFromEnd)
-		limited := filepath.Join(fileParts[pathFromEndSafe:]...)
+		fileParts := strings.Split(file, string(os.PathSeparator))
+		pathFromEndSafe := minInt(len(fileParts), pathDepthFromEnd)
+		limited := filepath.Join(fileParts[len(fileParts)-pathFromEndSafe:]...)
 		limitedCleaned := "??"
 		if limited != "" {
 			limitedCleaned = limited
@@ -215,8 +220,10 @@ package testassest
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 )
 
 func Func() {
@@ -224,12 +231,14 @@ func Func() {
 	printfdebug_Printf_Func("Leaving \"Func\"\n", 1)  // automatically added by printf-debugger. Do not change this comment. It is an identifier.
 }
 
-var _ = runtime.Caller // automatically added by printf-debugger. Do not change this comment. It is an identifier.
-var _ = filepath.Clean // automatically added by printf-debugger. Do not change this comment. It is an identifier.
-var _ = fmt.Println    // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = runtime.Caller   // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = filepath.Clean   // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = fmt.Println      // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = strings.Split    // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = os.PathSeparator // automatically added by printf-debugger. Do not change this comment. It is an identifier.
 func printfdebug_Printf_Func(message string, pathDepthFromEnd int) {
-	maxInt := func(first int, second int) (max int) {
-		if first > second {
+	minInt := func(first int, second int) (min int) {
+		if first < second {
 			return first
 		} else {
 			return second
@@ -238,9 +247,97 @@ func printfdebug_Printf_Func(message string, pathDepthFromEnd int) {
 
 	_, file, line, ok := runtime.Caller(1)
 	if ok {
-		fileParts := filepath.SplitList(file)
-		pathFromEndSafe := maxInt(len(fileParts), pathDepthFromEnd)
-		limited := filepath.Join(fileParts[pathFromEndSafe:]...)
+		fileParts := strings.Split(file, string(os.PathSeparator))
+		pathFromEndSafe := minInt(len(fileParts), pathDepthFromEnd)
+		limited := filepath.Join(fileParts[len(fileParts)-pathFromEndSafe:]...)
+		limitedCleaned := "??"
+		if limited != "" {
+			limitedCleaned = limited
+		}
+		fmt.Printf("%v:%v %v\n", limitedCleaned, line, message)
+	} else {
+		fmt.Printf("unkown_file:? %v\n", message)
+	}
+}
+
+```
+</details>
+<details>
+  <summary>Function Immediately Invoked (No Runtime)</summary>
+
+Running `printfdebug --file internal/tests/testassets/FuncImmediatelyInvoked.go add --no-runtime`
+On a file containing
+```go
+package testassest
+
+var FuncImmediatelyInvoked = func() error {
+	return nil
+}()
+
+```
+Will produce the following result
+```go
+package testassest
+
+import "fmt"
+
+var FuncImmediatelyInvoked = func() error {
+	fmt.Println("Entering \"FuncImmediatelyInvoked\"\n") // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+	fmt.Println("Leaving \"FuncImmediatelyInvoked\"\n")  // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+	return nil
+}()
+
+```
+</details>
+<details>
+  <summary>Function Immediately Invoked (With Runtime)</summary>
+
+Running `printfdebug --file internal/tests/testassets/FuncImmediatelyInvoked.go add`
+On a file containing
+```go
+package testassest
+
+var FuncImmediatelyInvoked = func() error {
+	return nil
+}()
+
+```
+Will produce the following result
+```go
+package testassest
+
+import (
+	"fmt"
+	"os"
+	"path/filepath"
+	"runtime"
+	"strings"
+)
+
+var FuncImmediatelyInvoked = func() error {
+	printfdebug_Printf_FuncImmediatelyInvoked("Entering \"FuncImmediatelyInvoked\"\n", 1) // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+	printfdebug_Printf_FuncImmediatelyInvoked("Leaving \"FuncImmediatelyInvoked\"\n", 1)  // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+	return nil
+}()
+var _ = filepath.Clean   // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = fmt.Println      // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = strings.Split    // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = os.PathSeparator // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = runtime.Caller   // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+func printfdebug_Printf_FuncImmediatelyInvoked(message string, pathDepthFromEnd int) {
+	minInt := func(first int, second int) (min int) {
+		if first < second {
+			return first
+		} else {
+			return second
+		}
+	}
+
+	_, file, line, ok := runtime.Caller(1)
+	if ok {
+		fileParts := strings.Split(file, string(os.PathSeparator))
+		pathFromEndSafe := minInt(len(fileParts), pathDepthFromEnd)
+		limited := filepath.Join(fileParts[len(fileParts)-pathFromEndSafe:]...)
 		limitedCleaned := "??"
 		if limited != "" {
 			limitedCleaned = limited
@@ -345,8 +442,10 @@ package testassest
 import (
 	"fmt"
 	"log"
+	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 )
 
 func FuncLogFatal() {
@@ -371,12 +470,14 @@ func FuncLogFatalf() {
 	printfdebug_Printf_FuncLogFatal("Leaving \"FuncLogFatalf\"\n", 1) // automatically added by printf-debugger. Do not change this comment. It is an identifier.
 }
 
-var _ = runtime.Caller // automatically added by printf-debugger. Do not change this comment. It is an identifier.
-var _ = filepath.Clean // automatically added by printf-debugger. Do not change this comment. It is an identifier.
-var _ = fmt.Println    // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = runtime.Caller   // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = filepath.Clean   // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = fmt.Println      // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = strings.Split    // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = os.PathSeparator // automatically added by printf-debugger. Do not change this comment. It is an identifier.
 func printfdebug_Printf_FuncLogFatal(message string, pathDepthFromEnd int) {
-	maxInt := func(first int, second int) (max int) {
-		if first > second {
+	minInt := func(first int, second int) (min int) {
+		if first < second {
 			return first
 		} else {
 			return second
@@ -385,9 +486,9 @@ func printfdebug_Printf_FuncLogFatal(message string, pathDepthFromEnd int) {
 
 	_, file, line, ok := runtime.Caller(1)
 	if ok {
-		fileParts := filepath.SplitList(file)
-		pathFromEndSafe := maxInt(len(fileParts), pathDepthFromEnd)
-		limited := filepath.Join(fileParts[pathFromEndSafe:]...)
+		fileParts := strings.Split(file, string(os.PathSeparator))
+		pathFromEndSafe := minInt(len(fileParts), pathDepthFromEnd)
+		limited := filepath.Join(fileParts[len(fileParts)-pathFromEndSafe:]...)
 		limitedCleaned := "??"
 		if limited != "" {
 			limitedCleaned = limited
@@ -457,6 +558,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 )
 
 func FuncOsExit() {
@@ -466,12 +568,14 @@ func FuncOsExit() {
 	printfdebug_Printf_FuncOsExit("Leaving \"FuncOsExit\"\n", 1) // automatically added by printf-debugger. Do not change this comment. It is an identifier.
 }
 
-var _ = filepath.Clean // automatically added by printf-debugger. Do not change this comment. It is an identifier.
-var _ = fmt.Println    // automatically added by printf-debugger. Do not change this comment. It is an identifier.
-var _ = runtime.Caller // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = fmt.Println      // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = strings.Split    // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = os.PathSeparator // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = runtime.Caller   // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = filepath.Clean   // automatically added by printf-debugger. Do not change this comment. It is an identifier.
 func printfdebug_Printf_FuncOsExit(message string, pathDepthFromEnd int) {
-	maxInt := func(first int, second int) (max int) {
-		if first > second {
+	minInt := func(first int, second int) (min int) {
+		if first < second {
 			return first
 		} else {
 			return second
@@ -480,9 +584,9 @@ func printfdebug_Printf_FuncOsExit(message string, pathDepthFromEnd int) {
 
 	_, file, line, ok := runtime.Caller(1)
 	if ok {
-		fileParts := filepath.SplitList(file)
-		pathFromEndSafe := maxInt(len(fileParts), pathDepthFromEnd)
-		limited := filepath.Join(fileParts[pathFromEndSafe:]...)
+		fileParts := strings.Split(file, string(os.PathSeparator))
+		pathFromEndSafe := minInt(len(fileParts), pathDepthFromEnd)
+		limited := filepath.Join(fileParts[len(fileParts)-pathFromEndSafe:]...)
 		limitedCleaned := "??"
 		if limited != "" {
 			limitedCleaned = limited
@@ -545,8 +649,10 @@ package testassest
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 )
 
 func FuncPanic() {
@@ -557,12 +663,14 @@ func FuncPanic() {
 	return
 }
 
-var _ = runtime.Caller // automatically added by printf-debugger. Do not change this comment. It is an identifier.
-var _ = filepath.Clean // automatically added by printf-debugger. Do not change this comment. It is an identifier.
-var _ = fmt.Println    // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = strings.Split    // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = os.PathSeparator // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = runtime.Caller   // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = filepath.Clean   // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = fmt.Println      // automatically added by printf-debugger. Do not change this comment. It is an identifier.
 func printfdebug_Printf_FuncPanic(message string, pathDepthFromEnd int) {
-	maxInt := func(first int, second int) (max int) {
-		if first > second {
+	minInt := func(first int, second int) (min int) {
+		if first < second {
 			return first
 		} else {
 			return second
@@ -571,9 +679,9 @@ func printfdebug_Printf_FuncPanic(message string, pathDepthFromEnd int) {
 
 	_, file, line, ok := runtime.Caller(1)
 	if ok {
-		fileParts := filepath.SplitList(file)
-		pathFromEndSafe := maxInt(len(fileParts), pathDepthFromEnd)
-		limited := filepath.Join(fileParts[pathFromEndSafe:]...)
+		fileParts := strings.Split(file, string(os.PathSeparator))
+		pathFromEndSafe := minInt(len(fileParts), pathDepthFromEnd)
+		limited := filepath.Join(fileParts[len(fileParts)-pathFromEndSafe:]...)
 		limitedCleaned := "??"
 		if limited != "" {
 			limitedCleaned = limited
@@ -632,8 +740,10 @@ package testassest
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 )
 
 var FuncStoredAsVar = func() error {
@@ -641,12 +751,14 @@ var FuncStoredAsVar = func() error {
 	printfdebug_Printf_FuncStoredAsVar("Leaving \"FuncStoredAsVar\"\n", 1)  // automatically added by printf-debugger. Do not change this comment. It is an identifier.
 	return nil
 }
-var _ = runtime.Caller // automatically added by printf-debugger. Do not change this comment. It is an identifier.
-var _ = filepath.Clean // automatically added by printf-debugger. Do not change this comment. It is an identifier.
-var _ = fmt.Println    // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = runtime.Caller   // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = filepath.Clean   // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = fmt.Println      // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = strings.Split    // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = os.PathSeparator // automatically added by printf-debugger. Do not change this comment. It is an identifier.
 func printfdebug_Printf_FuncStoredAsVar(message string, pathDepthFromEnd int) {
-	maxInt := func(first int, second int) (max int) {
-		if first > second {
+	minInt := func(first int, second int) (min int) {
+		if first < second {
 			return first
 		} else {
 			return second
@@ -655,9 +767,9 @@ func printfdebug_Printf_FuncStoredAsVar(message string, pathDepthFromEnd int) {
 
 	_, file, line, ok := runtime.Caller(1)
 	if ok {
-		fileParts := filepath.SplitList(file)
-		pathFromEndSafe := maxInt(len(fileParts), pathDepthFromEnd)
-		limited := filepath.Join(fileParts[pathFromEndSafe:]...)
+		fileParts := strings.Split(file, string(os.PathSeparator))
+		pathFromEndSafe := minInt(len(fileParts), pathDepthFromEnd)
+		limited := filepath.Join(fileParts[len(fileParts)-pathFromEndSafe:]...)
 		limitedCleaned := "??"
 		if limited != "" {
 			limitedCleaned = limited
@@ -744,8 +856,10 @@ package testassest
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 )
 
 func FuncStoredAsVarAssignment() {
@@ -766,12 +880,14 @@ func FuncStoredAsVarAssignment() {
 	printfdebug_Printf_FuncStoredAsVarAssignment("Leaving \"FuncStoredAsVarAssignment\"\n", 1) // automatically added by printf-debugger. Do not change this comment. It is an identifier.
 }
 
-var _ = runtime.Caller // automatically added by printf-debugger. Do not change this comment. It is an identifier.
-var _ = filepath.Clean // automatically added by printf-debugger. Do not change this comment. It is an identifier.
-var _ = fmt.Println    // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = runtime.Caller   // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = filepath.Clean   // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = fmt.Println      // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = strings.Split    // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = os.PathSeparator // automatically added by printf-debugger. Do not change this comment. It is an identifier.
 func printfdebug_Printf_FuncStoredAsVarAssignment(message string, pathDepthFromEnd int) {
-	maxInt := func(first int, second int) (max int) {
-		if first > second {
+	minInt := func(first int, second int) (min int) {
+		if first < second {
 			return first
 		} else {
 			return second
@@ -780,9 +896,9 @@ func printfdebug_Printf_FuncStoredAsVarAssignment(message string, pathDepthFromE
 
 	_, file, line, ok := runtime.Caller(1)
 	if ok {
-		fileParts := filepath.SplitList(file)
-		pathFromEndSafe := maxInt(len(fileParts), pathDepthFromEnd)
-		limited := filepath.Join(fileParts[pathFromEndSafe:]...)
+		fileParts := strings.Split(file, string(os.PathSeparator))
+		pathFromEndSafe := minInt(len(fileParts), pathDepthFromEnd)
+		limited := filepath.Join(fileParts[len(fileParts)-pathFromEndSafe:]...)
 		limitedCleaned := "??"
 		if limited != "" {
 			limitedCleaned = limited
@@ -872,8 +988,10 @@ package testassest
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 )
 
 func FuncStoredAsVarValueSpec() {
@@ -895,12 +1013,14 @@ func FuncStoredAsVarValueSpec() {
 	printfdebug_Printf_FuncStoredAsVarValueSpec("Leaving \"FuncStoredAsVarValueSpec\"\n", 1) // automatically added by printf-debugger. Do not change this comment. It is an identifier.
 }
 
-var _ = runtime.Caller // automatically added by printf-debugger. Do not change this comment. It is an identifier.
-var _ = filepath.Clean // automatically added by printf-debugger. Do not change this comment. It is an identifier.
-var _ = fmt.Println    // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = filepath.Clean   // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = fmt.Println      // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = strings.Split    // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = os.PathSeparator // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = runtime.Caller   // automatically added by printf-debugger. Do not change this comment. It is an identifier.
 func printfdebug_Printf_FuncStoredAsVarValueSpec(message string, pathDepthFromEnd int) {
-	maxInt := func(first int, second int) (max int) {
-		if first > second {
+	minInt := func(first int, second int) (min int) {
+		if first < second {
 			return first
 		} else {
 			return second
@@ -909,9 +1029,9 @@ func printfdebug_Printf_FuncStoredAsVarValueSpec(message string, pathDepthFromEn
 
 	_, file, line, ok := runtime.Caller(1)
 	if ok {
-		fileParts := filepath.SplitList(file)
-		pathFromEndSafe := maxInt(len(fileParts), pathDepthFromEnd)
-		limited := filepath.Join(fileParts[pathFromEndSafe:]...)
+		fileParts := strings.Split(file, string(os.PathSeparator))
+		pathFromEndSafe := minInt(len(fileParts), pathDepthFromEnd)
+		limited := filepath.Join(fileParts[len(fileParts)-pathFromEndSafe:]...)
 		limitedCleaned := "??"
 		if limited != "" {
 			limitedCleaned = limited
@@ -985,8 +1105,10 @@ package testassest
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 )
 
 func FuncWithArgsAndReturn(s2 string) error {
@@ -1000,12 +1122,14 @@ func FuncWithArgsAndReturn(s2 string) error {
 	return nil //This is inline comment
 }
 
-var _ = fmt.Println    // automatically added by printf-debugger. Do not change this comment. It is an identifier.
-var _ = runtime.Caller // automatically added by printf-debugger. Do not change this comment. It is an identifier.
-var _ = filepath.Clean // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = runtime.Caller   // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = filepath.Clean   // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = fmt.Println      // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = strings.Split    // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = os.PathSeparator // automatically added by printf-debugger. Do not change this comment. It is an identifier.
 func printfdebug_Printf_FuncWithArgsAndReturn(message string, pathDepthFromEnd int) {
-	maxInt := func(first int, second int) (max int) {
-		if first > second {
+	minInt := func(first int, second int) (min int) {
+		if first < second {
 			return first
 		} else {
 			return second
@@ -1014,9 +1138,9 @@ func printfdebug_Printf_FuncWithArgsAndReturn(message string, pathDepthFromEnd i
 
 	_, file, line, ok := runtime.Caller(1)
 	if ok {
-		fileParts := filepath.SplitList(file)
-		pathFromEndSafe := maxInt(len(fileParts), pathDepthFromEnd)
-		limited := filepath.Join(fileParts[pathFromEndSafe:]...)
+		fileParts := strings.Split(file, string(os.PathSeparator))
+		pathFromEndSafe := minInt(len(fileParts), pathDepthFromEnd)
+		limited := filepath.Join(fileParts[len(fileParts)-pathFromEndSafe:]...)
 		limitedCleaned := "??"
 		if limited != "" {
 			limitedCleaned = limited
@@ -1075,8 +1199,10 @@ package testassest
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 )
 
 func FuncWithExplicitReturn() {
@@ -1085,12 +1211,14 @@ func FuncWithExplicitReturn() {
 	return
 }
 
-var _ = runtime.Caller // automatically added by printf-debugger. Do not change this comment. It is an identifier.
-var _ = filepath.Clean // automatically added by printf-debugger. Do not change this comment. It is an identifier.
-var _ = fmt.Println    // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = strings.Split    // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = os.PathSeparator // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = runtime.Caller   // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = filepath.Clean   // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = fmt.Println      // automatically added by printf-debugger. Do not change this comment. It is an identifier.
 func printfdebug_Printf_FuncWithExplicitReturn(message string, pathDepthFromEnd int) {
-	maxInt := func(first int, second int) (max int) {
-		if first > second {
+	minInt := func(first int, second int) (min int) {
+		if first < second {
 			return first
 		} else {
 			return second
@@ -1099,9 +1227,9 @@ func printfdebug_Printf_FuncWithExplicitReturn(message string, pathDepthFromEnd 
 
 	_, file, line, ok := runtime.Caller(1)
 	if ok {
-		fileParts := filepath.SplitList(file)
-		pathFromEndSafe := maxInt(len(fileParts), pathDepthFromEnd)
-		limited := filepath.Join(fileParts[pathFromEndSafe:]...)
+		fileParts := strings.Split(file, string(os.PathSeparator))
+		pathFromEndSafe := minInt(len(fileParts), pathDepthFromEnd)
+		limited := filepath.Join(fileParts[len(fileParts)-pathFromEndSafe:]...)
 		limitedCleaned := "??"
 		if limited != "" {
 			limitedCleaned = limited
@@ -1187,8 +1315,10 @@ package testassest
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 )
 
 func FuncWithManyReturnStatements() {
@@ -1208,12 +1338,14 @@ func FuncWithManyReturnStatements() {
 	printfdebug_Printf_FuncWithManyReturnStatements("Leaving \"FuncWithManyReturnStatements\"\n", 1) // automatically added by printf-debugger. Do not change this comment. It is an identifier.
 }
 
-var _ = runtime.Caller // automatically added by printf-debugger. Do not change this comment. It is an identifier.
-var _ = filepath.Clean // automatically added by printf-debugger. Do not change this comment. It is an identifier.
-var _ = fmt.Println    // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = runtime.Caller   // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = filepath.Clean   // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = fmt.Println      // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = strings.Split    // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = os.PathSeparator // automatically added by printf-debugger. Do not change this comment. It is an identifier.
 func printfdebug_Printf_FuncWithManyReturnStatements(message string, pathDepthFromEnd int) {
-	maxInt := func(first int, second int) (max int) {
-		if first > second {
+	minInt := func(first int, second int) (min int) {
+		if first < second {
 			return first
 		} else {
 			return second
@@ -1222,9 +1354,9 @@ func printfdebug_Printf_FuncWithManyReturnStatements(message string, pathDepthFr
 
 	_, file, line, ok := runtime.Caller(1)
 	if ok {
-		fileParts := filepath.SplitList(file)
-		pathFromEndSafe := maxInt(len(fileParts), pathDepthFromEnd)
-		limited := filepath.Join(fileParts[pathFromEndSafe:]...)
+		fileParts := strings.Split(file, string(os.PathSeparator))
+		pathFromEndSafe := minInt(len(fileParts), pathDepthFromEnd)
+		limited := filepath.Join(fileParts[len(fileParts)-pathFromEndSafe:]...)
 		limitedCleaned := "??"
 		if limited != "" {
 			limitedCleaned = limited
@@ -1300,8 +1432,10 @@ package testassest
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 )
 
 func FuncWithNestedAnonymousFuncs() {
@@ -1319,12 +1453,14 @@ func FuncWithNestedAnonymousFuncs() {
 	printfdebug_Printf_FuncWithNestedAnonymousFuncs("Leaving \"FuncWithNestedAnonymousFuncs\"\n", 1) // automatically added by printf-debugger. Do not change this comment. It is an identifier.
 }
 
-var _ = runtime.Caller // automatically added by printf-debugger. Do not change this comment. It is an identifier.
-var _ = filepath.Clean // automatically added by printf-debugger. Do not change this comment. It is an identifier.
-var _ = fmt.Println    // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = os.PathSeparator // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = runtime.Caller   // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = filepath.Clean   // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = fmt.Println      // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = strings.Split    // automatically added by printf-debugger. Do not change this comment. It is an identifier.
 func printfdebug_Printf_FuncWithNestedAnonymousFuncs(message string, pathDepthFromEnd int) {
-	maxInt := func(first int, second int) (max int) {
-		if first > second {
+	minInt := func(first int, second int) (min int) {
+		if first < second {
 			return first
 		} else {
 			return second
@@ -1333,9 +1469,9 @@ func printfdebug_Printf_FuncWithNestedAnonymousFuncs(message string, pathDepthFr
 
 	_, file, line, ok := runtime.Caller(1)
 	if ok {
-		fileParts := filepath.SplitList(file)
-		pathFromEndSafe := maxInt(len(fileParts), pathDepthFromEnd)
-		limited := filepath.Join(fileParts[pathFromEndSafe:]...)
+		fileParts := strings.Split(file, string(os.PathSeparator))
+		pathFromEndSafe := minInt(len(fileParts), pathDepthFromEnd)
+		limited := filepath.Join(fileParts[len(fileParts)-pathFromEndSafe:]...)
 		limitedCleaned := "??"
 		if limited != "" {
 			limitedCleaned = limited
@@ -1394,8 +1530,10 @@ package testassest
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 )
 
 func (s *S) StructMethod() {
@@ -1404,12 +1542,14 @@ func (s *S) StructMethod() {
 	printfdebug_Printf_StructMethod("Leaving \"StructMethod\"\n", 1)  // automatically added by printf-debugger. Do not change this comment. It is an identifier.
 }
 
-var _ = filepath.Clean // automatically added by printf-debugger. Do not change this comment. It is an identifier.
-var _ = fmt.Println    // automatically added by printf-debugger. Do not change this comment. It is an identifier.
-var _ = runtime.Caller // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = filepath.Clean   // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = fmt.Println      // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = strings.Split    // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = os.PathSeparator // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = runtime.Caller   // automatically added by printf-debugger. Do not change this comment. It is an identifier.
 func printfdebug_Printf_StructMethod(message string, pathDepthFromEnd int) {
-	maxInt := func(first int, second int) (max int) {
-		if first > second {
+	minInt := func(first int, second int) (min int) {
+		if first < second {
 			return first
 		} else {
 			return second
@@ -1418,9 +1558,9 @@ func printfdebug_Printf_StructMethod(message string, pathDepthFromEnd int) {
 
 	_, file, line, ok := runtime.Caller(1)
 	if ok {
-		fileParts := filepath.SplitList(file)
-		pathFromEndSafe := maxInt(len(fileParts), pathDepthFromEnd)
-		limited := filepath.Join(fileParts[pathFromEndSafe:]...)
+		fileParts := strings.Split(file, string(os.PathSeparator))
+		pathFromEndSafe := minInt(len(fileParts), pathDepthFromEnd)
+		limited := filepath.Join(fileParts[len(fileParts)-pathFromEndSafe:]...)
 		limitedCleaned := "??"
 		if limited != "" {
 			limitedCleaned = limited
@@ -1476,8 +1616,10 @@ package testassest
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 )
 
 func (s *S) StructMethodWithArgs(s2 string) {
@@ -1485,12 +1627,14 @@ func (s *S) StructMethodWithArgs(s2 string) {
 	printfdebug_Printf_StructMethodWithArgs("Leaving \"StructMethodWithArgs\"\n", 1)  // automatically added by printf-debugger. Do not change this comment. It is an identifier.
 }
 
-var _ = runtime.Caller // automatically added by printf-debugger. Do not change this comment. It is an identifier.
-var _ = filepath.Clean // automatically added by printf-debugger. Do not change this comment. It is an identifier.
-var _ = fmt.Println    // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = strings.Split    // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = os.PathSeparator // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = runtime.Caller   // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = filepath.Clean   // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = fmt.Println      // automatically added by printf-debugger. Do not change this comment. It is an identifier.
 func printfdebug_Printf_StructMethodWithArgs(message string, pathDepthFromEnd int) {
-	maxInt := func(first int, second int) (max int) {
-		if first > second {
+	minInt := func(first int, second int) (min int) {
+		if first < second {
 			return first
 		} else {
 			return second
@@ -1499,9 +1643,9 @@ func printfdebug_Printf_StructMethodWithArgs(message string, pathDepthFromEnd in
 
 	_, file, line, ok := runtime.Caller(1)
 	if ok {
-		fileParts := filepath.SplitList(file)
-		pathFromEndSafe := maxInt(len(fileParts), pathDepthFromEnd)
-		limited := filepath.Join(fileParts[pathFromEndSafe:]...)
+		fileParts := strings.Split(file, string(os.PathSeparator))
+		pathFromEndSafe := minInt(len(fileParts), pathDepthFromEnd)
+		limited := filepath.Join(fileParts[len(fileParts)-pathFromEndSafe:]...)
 		limitedCleaned := "??"
 		if limited != "" {
 			limitedCleaned = limited
@@ -1560,8 +1704,10 @@ package testassest
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 )
 
 func (s *S) StructMethodWithArgsAndReturn(s2 string) error {
@@ -1570,12 +1716,14 @@ func (s *S) StructMethodWithArgsAndReturn(s2 string) error {
 	return nil
 }
 
-var _ = fmt.Println    // automatically added by printf-debugger. Do not change this comment. It is an identifier.
-var _ = runtime.Caller // automatically added by printf-debugger. Do not change this comment. It is an identifier.
-var _ = filepath.Clean // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = strings.Split    // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = os.PathSeparator // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = runtime.Caller   // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = filepath.Clean   // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = fmt.Println      // automatically added by printf-debugger. Do not change this comment. It is an identifier.
 func printfdebug_Printf_StructMethodWithArgsAndReturn(message string, pathDepthFromEnd int) {
-	maxInt := func(first int, second int) (max int) {
-		if first > second {
+	minInt := func(first int, second int) (min int) {
+		if first < second {
 			return first
 		} else {
 			return second
@@ -1584,9 +1732,9 @@ func printfdebug_Printf_StructMethodWithArgsAndReturn(message string, pathDepthF
 
 	_, file, line, ok := runtime.Caller(1)
 	if ok {
-		fileParts := filepath.SplitList(file)
-		pathFromEndSafe := maxInt(len(fileParts), pathDepthFromEnd)
-		limited := filepath.Join(fileParts[pathFromEndSafe:]...)
+		fileParts := strings.Split(file, string(os.PathSeparator))
+		pathFromEndSafe := minInt(len(fileParts), pathDepthFromEnd)
+		limited := filepath.Join(fileParts[len(fileParts)-pathFromEndSafe:]...)
 		limitedCleaned := "??"
 		if limited != "" {
 			limitedCleaned = limited
@@ -1645,8 +1793,10 @@ package testassest
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 )
 
 func (s *S) StructMethodWithReturn() error {
@@ -1655,12 +1805,14 @@ func (s *S) StructMethodWithReturn() error {
 	return nil
 }
 
-var _ = runtime.Caller // automatically added by printf-debugger. Do not change this comment. It is an identifier.
-var _ = filepath.Clean // automatically added by printf-debugger. Do not change this comment. It is an identifier.
-var _ = fmt.Println    // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = runtime.Caller   // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = filepath.Clean   // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = fmt.Println      // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = strings.Split    // automatically added by printf-debugger. Do not change this comment. It is an identifier.
+var _ = os.PathSeparator // automatically added by printf-debugger. Do not change this comment. It is an identifier.
 func printfdebug_Printf_StructMethodWithReturn(message string, pathDepthFromEnd int) {
-	maxInt := func(first int, second int) (max int) {
-		if first > second {
+	minInt := func(first int, second int) (min int) {
+		if first < second {
 			return first
 		} else {
 			return second
@@ -1669,9 +1821,9 @@ func printfdebug_Printf_StructMethodWithReturn(message string, pathDepthFromEnd 
 
 	_, file, line, ok := runtime.Caller(1)
 	if ok {
-		fileParts := filepath.SplitList(file)
-		pathFromEndSafe := maxInt(len(fileParts), pathDepthFromEnd)
-		limited := filepath.Join(fileParts[pathFromEndSafe:]...)
+		fileParts := strings.Split(file, string(os.PathSeparator))
+		pathFromEndSafe := minInt(len(fileParts), pathDepthFromEnd)
+		limited := filepath.Join(fileParts[len(fileParts)-pathFromEndSafe:]...)
 		limitedCleaned := "??"
 		if limited != "" {
 			limitedCleaned = limited
