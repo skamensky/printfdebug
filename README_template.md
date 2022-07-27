@@ -15,7 +15,7 @@ I don't know how to use go debug tools.
 - Captures all function exits branches, panics, system exits, and fatal logs
 - Optionally injects a function to help print the current file name and line number (if anyone knows a way of doing this on a single line, I could remove this feature completely!)
 - Support all functions (that I know of)
-  - functions stored as variables
+  - functions stored as variables (uses variable name as function name)
   - struct methods
   - anonymous functions
   - declared functions
