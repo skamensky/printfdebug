@@ -15,7 +15,7 @@ var OPTIONS = &options.Options{}
 
 var rootCmd = &cobra.Command{
 	Use:   "printfdebug",
-	Short: "A brief description of your application",
+	Short: "Organized debugging using printf statements",
 	Long:  ``,
 }
 
