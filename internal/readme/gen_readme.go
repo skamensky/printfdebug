@@ -42,7 +42,7 @@ func GetMarkdownBlockForFunction(file tests.TestFile) string {
 			words[idx] = "Functions"
 		}
 		if word == "Args" {
-			words[idx] = "Arguments§"
+			words[idx] = "Arguments"
 		}
 	}
 	exampleName := strings.Join(words, " ")

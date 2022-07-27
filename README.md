@@ -925,7 +925,7 @@ func printfdebug_Printf_FuncStoredAsVarValueSpec(message string, pathDepthFromEn
 ```
 </details>
 <details>
-  <summary>Function With Arguments§ And Return (No Runtime)</summary>
+  <summary>Function With Arguments And Return (No Runtime)</summary>
 
 Running `printfdebug --file internal/tests/testassets/FuncWithArgsAndReturn.go add --no-runtime`
 On a file containing
@@ -962,7 +962,7 @@ func FuncWithArgsAndReturn(s2 string) error {
 ```
 </details>
 <details>
-  <summary>Function With Arguments§ And Return (With Runtime)</summary>
+  <summary>Function With Arguments And Return (With Runtime)</summary>
 
 Running `printfdebug --file internal/tests/testassets/FuncWithArgsAndReturn.go add`
 On a file containing
@@ -1434,7 +1434,7 @@ func printfdebug_Printf_StructMethod(message string, pathDepthFromEnd int) {
 ```
 </details>
 <details>
-  <summary>Struct Method With Arguments§ (No Runtime)</summary>
+  <summary>Struct Method With Arguments (No Runtime)</summary>
 
 Running `printfdebug --file internal/tests/testassets/StructMethodWithArgs.go add --no-runtime`
 On a file containing
@@ -1459,7 +1459,7 @@ func (s *S) StructMethodWithArgs(s2 string) {
 ```
 </details>
 <details>
-  <summary>Struct Method With Arguments§ (With Runtime)</summary>
+  <summary>Struct Method With Arguments (With Runtime)</summary>
 
 Running `printfdebug --file internal/tests/testassets/StructMethodWithArgs.go add`
 On a file containing
@@ -1515,7 +1515,7 @@ func printfdebug_Printf_StructMethodWithArgs(message string, pathDepthFromEnd in
 ```
 </details>
 <details>
-  <summary>Struct Method With Arguments§ And Return (No Runtime)</summary>
+  <summary>Struct Method With Arguments And Return (No Runtime)</summary>
 
 Running `printfdebug --file internal/tests/testassets/StructMethodWithArgsAndReturn.go add --no-runtime`
 On a file containing
@@ -1542,7 +1542,7 @@ func (s *S) StructMethodWithArgsAndReturn(s2 string) error {
 ```
 </details>
 <details>
-  <summary>Struct Method With Arguments§ And Return (With Runtime)</summary>
+  <summary>Struct Method With Arguments And Return (With Runtime)</summary>
 
 Running `printfdebug --file internal/tests/testassets/StructMethodWithArgsAndReturn.go add`
 On a file containing
