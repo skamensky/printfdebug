@@ -20,7 +20,7 @@ I don't know how to use go debug tools.
   - anonymous functions
   - declared functions
   - nested functions
-  Idempotent operations.
+- Idempotent operations.
   - Running `printfdebug add` multiple times on the same input produces sane results
   - Running `printfdebug add` on code that's been modified since the last run updates the code to add new `printf` statements
   - Running `printfdebug remove` cleans up all traces of the debugger
