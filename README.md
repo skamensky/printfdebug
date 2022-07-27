@@ -53,7 +53,7 @@ Use "printfdebug [command] --help" for more information about a command.
 - Working with custom code bases that have modified the standard library
 
 # Todo
-- Go fmt automatically (or does dst alreadu handle that?)
+- Go fmt automatically (or does dst already handle that?)
 - Optional message formatting (before and after function with linenum and name as template vars)
 - Optional list of excluded or included function names
 - Clean up TODO's in code
@@ -75,7 +75,7 @@ To add a new test
 The readme is generated automatically to inject examples and CLI usage.
 After adding tests or modifying the CLI, run ` go run internal/readme/gen_readme.go`
 
-Do not make changed directly to the `README.md` file. Only ever make changes to the file `README_template.md` and regenerate.
+Do not make changes directly to the `README.md` file. Only ever make changes to the file `README_template.md` and regenerate.
 # Examples
 The below examples are generated automatically from test results
 
