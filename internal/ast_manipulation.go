@@ -57,6 +57,8 @@ func getForceImportVariables() []*dst.GenDecl {
 		"runtime":       "Caller",
 		"path/filepath": "Clean",
 		"fmt":           "Println",
+		"strings":       "Split",
+		"os":            "PathSeparator",
 	}
 
 	valueSpecs := []*dst.GenDecl{}
@@ -105,8 +107,8 @@ func getFileSpecificFunctionName(filename string) string {
 }
 func getRuntimeFuncAsString(functionName string) string {
 	return fmt.Sprintf(`func %v(message string, pathDepthFromEnd int) {
-	maxInt := func(first int, second int) (max int) {
-		if first > second {
+	minInt := func(first int, second int) (min int) {
+		if first < second {
 			return first
 		} else {
 			return second
@@ -115,9 +117,9 @@ func getRuntimeFuncAsString(functionName string) string {
 
 	_, file, line, ok := runtime.Caller(1)
 	if ok {
-		fileParts := filepath.SplitList(file)
-		pathFromEndSafe := maxInt(len(fileParts), pathDepthFromEnd)
-		limited := filepath.Join(fileParts[pathFromEndSafe:]...)
+		fileParts := strings.Split(file, string(os.PathSeparator))
+		pathFromEndSafe := minInt(len(fileParts), pathDepthFromEnd)
+		limited := filepath.Join(fileParts[len(fileParts)-pathFromEndSafe:]...)
 		limitedCleaned := "??"
 		if limited != "" {
 			limitedCleaned = limited
