@@ -12,7 +12,7 @@ import (
 var backTick = "`"
 var tripBackTick = "```"
 
-func SplitByCamcel(src string) []string {
+func SplitByCamel(src string) []string {
 	// from https://www.golangprograms.com/split-a-string-at-uppercase-letters-using-regular-expression-in-golang.html
 	re := regexp.MustCompile(`[A-Z][^A-Z]*`)
 	results := []string{}
@@ -28,7 +28,7 @@ func GetMarkdownBlockForFunction(file tests.TestFile) string {
 	cmd := file.BuildCommand(false)
 	inContent := file.GetInputFileContents()
 	outContent := file.GetOutputFileContents()
-	words := SplitByCamcel(file.GetFuncName())
+	words := SplitByCamel(file.GetFuncName())
 	if file.Type == tests.NoRuntime {
 		words = append(words, "(No Runtime)")
 	} else {
